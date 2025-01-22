@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { Link } from "expo-router"
 
 export default function Index() {
   return (
@@ -9,7 +10,11 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>manel</Text>
+      <Link href="/sign-in">Sign In </Link>
+      <Link href="/explore">Explore page </Link>
+      <Link href="/profile">Profile page </Link>
+      <Link href="/propreties/1">Proprety</Link>
+
     </View>
   );
 }
