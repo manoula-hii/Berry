@@ -37,27 +37,28 @@ const Auth = () => {
       >
         <Image
           source={images.sculpture}
-          className="w-full h-4/6"
+          className="w-72 h-3/6 mx-auto"
           resizeMode="contain"
         />
 
         <View className="px-10">
-          <Text className="text-base text-center uppercase font-rubik text-black-200">
-            Welcome To Real Scout
+          
+          <Text className="text-4xl font-rubik-bold text-black-300 text-center mt-0">
+            Welcome to  {"\n"}
+            <Text className="text-primary-300">Berry !</Text>
           </Text>
 
-          <Text className="text-3xl font-rubik-bold text-black-300 text-center mt-2">
-            Let's Get You Closer To {"\n"}
-            <Text className="text-primary-300">Your Ideal Home</Text>
+          <Text className="text-xl text-center  font-rubik text-black-200 mt-4">
+            Let's get you started.
           </Text>
 
-          <Text className="text-lg font-rubik text-black-200 text-center mt-12">
-            Login to Real Scout with Google
+          <Text className="text-xl font-rubik text-black-200 text-center mt-12">
+            Login to Berry with Google
           </Text>
 
           <TouchableOpacity
             onPress={handleLogin}
-            className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 mt-5"
+            className="bg-white shadow-md shadow-zinc-900 rounded-full w-full py-5 mt-5"
           >
             <View className="flex flex-row items-center justify-center">
               <Image
