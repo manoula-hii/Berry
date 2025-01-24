@@ -15,11 +15,11 @@ const TabIcon = ({
     title: string;
   }) => (
     <View className="flex-1 mt-3 flex flex-col items-center">
-      <Icon color={focused ? "red" : "gray"} size={24} />
+      <Icon color={focused ? "#660000" : "gray"} size={24} />
       <Text
         className={`${
           focused
-            ? "text-primary-300 font-rubik-medium"
+            ? "text-primary-100 font-rubik-medium"
             : "text-black-200 font-rubik"
         } text-xs w-full text-center mt-1`}
       >
@@ -38,7 +38,7 @@ const TabsLayout = () => {
           position: "absolute",
           borderTopColor: "#0061FF1A",
           borderTopWidth: 1,
-          minHeight: 70,
+          minHeight: 65,
         },
       }}
     >
