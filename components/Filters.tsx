@@ -1,16 +1,25 @@
 import {View, Text, ScrollView, TouchableOpacity} from 'react-native'
 import React, { useState } from 'react'
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { categories } from '@/constants/data';
 
 
 const Filters = ( ) => {
   const params = useLocalSearchParams<{filter?:string}>();
   const [selectedCategory, setSelectedCategory] = useState(params.filter || 'All');
-  const handleCategoryPress = (category: string) => {}
+  const handleCategoryPress = (category: string) => {  if (selectedCategory === category) {
+    setSelectedCategory("");
+    router.setParams({ filter: "" });
+    return;
+  }
+
+    setSelectedCategory(category);
+    router.setParams({ filter: category });
+  };
+
 
   return (
-<ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2 mb-3 ml-4">
+<ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2 mb-5 ml-4">
   {categories.map((item, index) => (
     <TouchableOpacity
       key={index}

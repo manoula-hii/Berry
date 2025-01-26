@@ -1,6 +1,7 @@
 import { ID } from "react-native-appwrite";
 import { databases, config } from "./appwrite";
 import { paintersImages, paintingsImages } from "./data";
+import { Query } from "react-native-appwrite"; 
 
 const COLLECTIONS = {
   PAINTER: config.paintersCollectionId,

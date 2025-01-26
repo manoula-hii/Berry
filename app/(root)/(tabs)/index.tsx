@@ -14,42 +14,45 @@ import { useAppwrite } from "@/lib/useAppwrite";
 import React, { useEffect } from "react";
 import NoResults from "@/components/NoResults";
 
-
 export default function Index() {
+  const { user } = useGlobalContext();
+  const params = useLocalSearchParams<{ query?: string; filter?: string }>();
+  const { data: latestPaintings, loading: latestPaintingsloading } =
+    useAppwrite({
+      fn: getLatestPaintings,
+    });
 
-  const {user} = useGlobalContext();
-  const params = useLocalSearchParams<{query?: string; filter?: string;}>();
-  const {data : latestPaintings, loading: latestPaintingsloading} = useAppwrite({
-    fn: getLatestPaintings
-  });
-
-  const {data: paintings, loading, refetch} = useAppwrite({
-    fn: getPaintings,
-    params: {
-      filter: params.filter!,
-      query: params.query!,
-      limit:6,
-    },
-    skip:true,
-  })
+    const {
+      data: paintings,
+      loading,
+      refetch,
+    } = useAppwrite({
+      fn: getPaintings,
+      params: {
+        filter: params.filter!, // Pass the filter (type) from URL params
+        query: params.query!,   // Pass the query (name) from URL params
+        limit: 20,
+      },
+      skip: true,
+    });
 
   const handleCardPress = (id: string) => router.push(`/propreties/${id}`);
 
-
-useEffect(() => {
-  refetch({
-    filter: params.filter!,
-    query: params.query!,
-    limit: 20,
-  })
-}, [params.filter, params.query])
-
+  useEffect(() => {
+    refetch({
+      filter: params.filter!,
+      query: params.query!,
+      limit: 20,
+    });
+  }, [params.filter, params.query]);
 
   return (
     <SafeAreaView className="bg-white h-full">
       <FlatList
         data={paintings}
-        renderItem={({ item }) => <Card item={item} onPress={() => handleCardPress(item.$id)}/>}
+        renderItem={({ item }) => (
+          <Card item={item} onPress={() => handleCardPress(item.$id)} />
+        )}
         keyExtractor={(item) => item.$id}
         numColumns={2}
         contentContainerClassName="pb-32"
@@ -58,14 +61,16 @@ useEffect(() => {
         ListEmptyComponent={
           loading ? (
             <ActivityIndicator size="large" className="text-primary-100 mt-5" />
-          ) : <NoResults />
+          ) : (
+            <NoResults />
+          )
         }
         ListHeaderComponent={
           <View>
             <View className="flex flex-row item-center justify-between mt-5 ml-4">
               <View className="flex flex-row items-center">
                 <Image
-                  source={{uri: user?.avatar}}
+                  source={{ uri: user?.avatar }}
                   className="size-12 rounded-full"
                 />
                 <View className="flex flex-col items-start ml-2 justify-center">
@@ -80,7 +85,7 @@ useEffect(() => {
               <icons.BellDot
                 size={24}
                 color="#660000"
-                style={{ marginTop: 9 , marginRight:15 }}
+                style={{ marginTop: 9, marginRight: 15 }}
               />
             </View>
             <Search />
@@ -96,19 +101,26 @@ useEffect(() => {
                 </TouchableOpacity>
               </View>
 
-              {latestPaintingsloading ? 
-              <ActivityIndicator size="large" className="text-primary-100" /> : !latestPaintings || latestPaintings.length === 0 ? <NoResults /> : (
+              {latestPaintingsloading ? (
+                <ActivityIndicator size="large" className="text-primary-100" />
+              ) : !latestPaintings || latestPaintings.length === 0 ? (
+                <NoResults />
+              ) : (
                 <FlatList
-                data={latestPaintings}
-                renderItem={({ item }) =>  <FeaturedCard item={item} onPress={() => handleCardPress(item.$id)}/>}
-                keyExtractor={(item) => item.$id}
-                horizontal
-                bounces={false}
-                showsHorizontalScrollIndicator={false}
-                contentContainerClassName="flex mt-4 ml-3.5"
-              />
+                  data={latestPaintings}
+                  renderItem={({ item }) => (
+                    <FeaturedCard
+                      item={item}
+                      onPress={() => handleCardPress(item.$id)}
+                    />
+                  )}
+                  keyExtractor={(item) => item.$id}
+                  horizontal
+                  bounces={false}
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerClassName="flex mt-4 ml-3.5"
+                />
               )}
-
             </View>
 
             <View className="flex flex-row items-center justify-between pr-4 ml-4">

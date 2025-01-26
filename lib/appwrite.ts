@@ -122,22 +122,30 @@ export async function getPaintings({
   limit?: number;
 }) {
   try {
+    // Base query: Order by creation date
     const buildQuery = [Query.orderDesc("$createdAt")];
 
-    if (filter && filter !== "All")
+    // Filter by type if filter is provided and not "All"
+    if (filter && filter !== "All") {
       buildQuery.push(Query.equal("type", filter));
+    }
 
-    if (query)
+    // Search by name or type if query is provided
+    if (query) {
       buildQuery.push(
         Query.or([
-          Query.search("name", query),
-          Query.search("rating", query),
-          Query.search("type", query),
+          Query.search("name", query), // Search by name
+          Query.search("type", query), // Search by type
         ])
       );
+    }
 
-    if (limit) buildQuery.push(Query.limit(limit));
+    // Add limit to the query if provided
+    if (limit) {
+      buildQuery.push(Query.limit(limit));
+    }
 
+    // Fetch paintings from the database
     const result = await databases.listDocuments(
       config.databaseId!,
       config.paintingsCollectionId!,
@@ -146,8 +154,8 @@ export async function getPaintings({
 
     return result.documents;
   } catch (error) {
-    console.error(error);
-    return [];
+    console.error("Error fetching paintings:", error);
+    return []; // Return an empty array in case of error
   }
 }
 
