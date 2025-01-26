@@ -10,7 +10,7 @@ const Filters = ( ) => {
   const handleCategoryPress = (category: string) => {}
 
   return (
-<ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2 mb-2">
+<ScrollView horizontal showsHorizontalScrollIndicator={false} className="mt-2 mb-3 ml-4">
   {categories.map((item, index) => (
     <TouchableOpacity
       key={index}

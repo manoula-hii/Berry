@@ -18,7 +18,7 @@ const Search = () => {
     }
 
     return (
-        <View className='mr-5'>
+        <View className='mr-5 ml-4'>
              <View className = "flex flex-row items-center justify-between w-full px-5 rounded-3xl bg-accent-100 border border-primary-100 mt-5 py-1">
            <View className="flex-1 flex flex-row items-center jusify-start z-50">
            <icons.Search size={22} color="#660000" style={{marginTop: 0}}/>
