@@ -18,10 +18,10 @@ export const config = {
   databaseId: process.env.EXPO_PUBLIC_APPWRITE_DATABASE_ID,
   galleriesCollectionId:
     process.env.EXPO_PUBLIC_APPWRITE_GALLERIES_COLLECTION_ID,
-  reviewsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_REVIEWS_COLLECTION_ID,
-  agentsCollectionId: process.env.EXPO_PUBLIC_APPWRITE_AGENTS_COLLECTION_ID,
-  propertiesCollectionId:
-    process.env.EXPO_PUBLIC_APPWRITE_PROPERTIES_COLLECTION_ID,
+
+  paintersCollectionId: process.env.EXPO_PUBLIC_APPWRITE_PAINTERS_COLLECTION_ID,
+  paintingsCollectionId:
+    process.env.EXPO_PUBLIC_APPWRITE_PAINTINGS_COLLECTION_ID,
   bucketId: process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID,
 };
 
@@ -97,11 +97,11 @@ export async function getCurrentUser() {
   }
 }
 
-export async function getLatestProperties() {
+export async function getLatestPaintings() {
   try {
     const result = await databases.listDocuments(
       config.databaseId!,
-      config.propertiesCollectionId!,
+      config.paintingsCollectionId!,
       [Query.orderAsc("$createdAt"), Query.limit(5)]
     );
 
@@ -112,7 +112,7 @@ export async function getLatestProperties() {
   }
 }
 
-export async function getProperties({
+export async function getPaintings({
   filter,
   query,
   limit,
@@ -131,7 +131,7 @@ export async function getProperties({
       buildQuery.push(
         Query.or([
           Query.search("name", query),
-          Query.search("address", query),
+          Query.search("rating", query),
           Query.search("type", query),
         ])
       );
@@ -140,7 +140,7 @@ export async function getProperties({
 
     const result = await databases.listDocuments(
       config.databaseId!,
-      config.propertiesCollectionId!,
+      config.paintingsCollectionId!,
       buildQuery
     );
 
@@ -156,7 +156,7 @@ export async function getPropertyById({ id }: { id: string }) {
   try {
     const result = await databases.getDocument(
       config.databaseId!,
-      config.propertiesCollectionId!,
+      config.paintingsCollectionId!,
       id
     );
     return result;
