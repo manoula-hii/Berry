@@ -152,7 +152,7 @@ export async function getPaintings({
 }
 
 // write function to get property by id
-export async function getPropertyById({ id }: { id: string }) {
+export async function getPaintingById({ id }: { id: string }) {
   try {
     const result = await databases.getDocument(
       config.databaseId!,

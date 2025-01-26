@@ -1,4 +1,4 @@
-import { FlatList, ScrollView } from "react-native"; // Import ScrollView
+import { Button, FlatList, ScrollView } from "react-native"; // Import ScrollView
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,6 +8,7 @@ import Search from "@/components/search";
 import { Card, FeaturedCard } from "@/components/Cards";
 import Filters from "@/components/Filters";
 import { useGlobalContext } from "@/lib/global-provider";
+import seed from "@/lib/seed";
 
 export default function Index() {
 
@@ -16,6 +17,7 @@ export default function Index() {
 
   return (
     <SafeAreaView className="bg-white h-full">
+
       <FlatList
         data={[1, 2, 3, 4]}
         renderItem={({ item }) => <Card />}
