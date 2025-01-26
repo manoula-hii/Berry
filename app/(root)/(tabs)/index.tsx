@@ -1,6 +1,6 @@
 import { Button, FlatList, ScrollView } from "react-native"; // Import ScrollView
 import { Text, View, Image, TouchableOpacity } from "react-native";
-import { Link } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import images from "@/constants/images";
 import { icons } from "lucide-react-native";
@@ -9,17 +9,44 @@ import { Card, FeaturedCard } from "@/components/Cards";
 import Filters from "@/components/Filters";
 import { useGlobalContext } from "@/lib/global-provider";
 import seed from "@/lib/seed";
+import { getLatestPaintings, getPaintings } from "@/lib/appwrite";
+import { useAppwrite } from "@/lib/useAppwrite";
+import { useEffect } from "react";
 
 export default function Index() {
 
   const {user} = useGlobalContext();
+  const params = useLocalSearchParams<{query?: string; filter?: string;}>();
+  const {data : latestPaintings, loading: latestPaintingsloading} = useAppwrite({
+    fn: getLatestPaintings
+  });
+
+  const {data: paintings, loading, refetch} = useAppwrite({
+    fn: getPaintings,
+    params: {
+      filter: params.filter!,
+      query: params.query!,
+      limit:6,
+    },
+    skip:true,
+  })
+
+  const handleCardPress = (id: string) => router.push(`/propreties/${id}`);
+
+
+useEffect(() => {
+  refetch({
+    filter: params.filter!,
+    query: params.query!,
+    limit: 6,
+  })
+}, [params.filter, params.query])
 
 
   return (
     <SafeAreaView className="bg-white h-full">
-
       <FlatList
-        data={[1, 2, 3, 4]}
+        data={paintings}
         renderItem={({ item }) => <Card />}
         keyExtractor={(item) => item.toString()}
         numColumns={2}
@@ -63,7 +90,7 @@ export default function Index() {
               </View>
 
               <FlatList
-                data={[1, 2, 3, 4]}
+                data={latestPaintings}
                 renderItem={({ item }) => <FeaturedCard />}
                 keyExtractor={(item) => item.toString()}
                 horizontal
