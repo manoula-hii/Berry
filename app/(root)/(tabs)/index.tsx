@@ -1,4 +1,4 @@
-import { Button, FlatList, ScrollView } from "react-native"; // Import ScrollView
+import { ActivityIndicator, Button, FlatList, ScrollView } from "react-native"; // Import ScrollView
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -11,7 +11,9 @@ import { useGlobalContext } from "@/lib/global-provider";
 import seed from "@/lib/seed";
 import { getLatestPaintings, getPaintings } from "@/lib/appwrite";
 import { useAppwrite } from "@/lib/useAppwrite";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import NoResults from "@/components/NoResults";
+
 
 export default function Index() {
 
@@ -38,7 +40,7 @@ useEffect(() => {
   refetch({
     filter: params.filter!,
     query: params.query!,
-    limit: 6,
+    limit: 20,
   })
 }, [params.filter, params.query])
 
@@ -47,12 +49,17 @@ useEffect(() => {
     <SafeAreaView className="bg-white h-full">
       <FlatList
         data={paintings}
-        renderItem={({ item }) => <Card />}
-        keyExtractor={(item) => item.toString()}
+        renderItem={({ item }) => <Card item={item} onPress={() => handleCardPress(item.$id)}/>}
+        keyExtractor={(item) => item.$id}
         numColumns={2}
         contentContainerClassName="pb-32"
         columnWrapperClassName="flex gap-5 px-5"
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          loading ? (
+            <ActivityIndicator size="large" className="text-primary-100 mt-5" />
+          ) : <NoResults />
+        }
         ListHeaderComponent={
           <View>
             <View className="flex flex-row item-center justify-between mt-5 ml-4">
@@ -89,15 +96,19 @@ useEffect(() => {
                 </TouchableOpacity>
               </View>
 
-              <FlatList
+              {latestPaintingsloading ? 
+              <ActivityIndicator size="large" className="text-primary-100" /> : !latestPaintings || latestPaintings.length === 0 ? <NoResults /> : (
+                <FlatList
                 data={latestPaintings}
-                renderItem={({ item }) => <FeaturedCard />}
-                keyExtractor={(item) => item.toString()}
+                renderItem={({ item }) =>  <FeaturedCard item={item} onPress={() => handleCardPress(item.$id)}/>}
+                keyExtractor={(item) => item.$id}
                 horizontal
                 bounces={false}
                 showsHorizontalScrollIndicator={false}
                 contentContainerClassName="flex mt-4 ml-3.5"
               />
+              )}
+
             </View>
 
             <View className="flex flex-row items-center justify-between pr-4 ml-4">

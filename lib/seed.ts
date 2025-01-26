@@ -1,6 +1,6 @@
 import { ID } from "react-native-appwrite";
 import { databases, config } from "./appwrite";
-import { paintersImages, galleryImages, paintingsImages } from "./data";
+import { paintersImages, paintingsImages } from "./data";
 
 const COLLECTIONS = {
   PAINTER: config.paintersCollectionId,
@@ -74,7 +74,7 @@ async function seed() {
 
     console.log("Cleared all existing data.");
 
-    // Seed Agents
+    // Seed Painters
     const painters = [];
     for (let i = 1; i <= 5; i++) {
       const agent = await databases.createDocument(
@@ -92,50 +92,59 @@ async function seed() {
     }
     console.log(`Seeded ${painters.length} painters.`);
 
-    // Seed Galleries
-    const galleries = [];
-    for (const image of galleryImages) {
-      const gallery = await databases.createDocument(
-        config.databaseId!,
-        COLLECTIONS.GALLERY!,
-        ID.unique(),
-        { image }
-      );
-      galleries.push(gallery);
-    }
+    // Track used images, names, and prices to ensure uniqueness
+    const usedImages = new Set<string>();
+    const usedNames = new Set<string>();
+    const usedPrices = new Set<number>();
 
-    console.log(`Seeded ${galleries.length} galleries.`);
-
-    // Seed Properties
+    // Seed Paintings
     for (let i = 1; i <= 20; i++) {
-      const assignedPainter = painters[Math.floor(Math.random() * painters.length)];
+      let image: string;
+      let name: string;
+      let price: number;
 
-      const assignedGalleries = getRandomSubset(galleries, 3, 8); // 3 to 8 galleries
+      // Generate unique image, name, and price
+      do {
+        image =
+          paintingsImages.length - 1 >= i
+            ? paintingsImages[i]
+            : paintingsImages[Math.floor(Math.random() * paintingsImages.length)];
+      } while (usedImages.has(image));
 
-      const image =
-        paintingsImages.length - 1 >= i
-          ? paintingsImages[i]
-          : paintingsImages[Math.floor(Math.random() * paintingsImages.length)];
+      do {
+        name = `Painting ${i}`;
+      } while (usedNames.has(name));
+
+      do {
+        price = Math.floor(Math.random() * 300) + 100;
+      } while (usedPrices.has(price));
+
+      // Mark the image, name, and price as used
+      usedImages.add(image);
+      usedNames.add(name);
+      usedPrices.add(price);
+
+      const assignedPainter =
+        painters[Math.floor(Math.random() * painters.length)];
 
       const painting = await databases.createDocument(
         config.databaseId!,
         COLLECTIONS.PAINTING!,
         ID.unique(),
         {
-          name: `Painting ${i}`,
+          name: name,
           type: paintingsTypes[
             Math.floor(Math.random() * paintingsTypes.length)
           ],
-          description: `This is the description for Painting ${i}.`,
-          price: Math.floor(Math.random() * 9000) + 1000,
+          description: `This is the description for ${name}.`,
+          price: price,
           rating: Math.floor(Math.random() * 5) + 1,
           image: image,
           painter: assignedPainter.$id,
-          gallery: assignedGalleries.map((gallery) => gallery.$id),
         }
       );
 
-      console.log(`Seeded property: ${painting.name}`);
+      console.log(`Seeded painting: ${painting.name}`);
     }
 
     console.log("Data seeding completed.");
