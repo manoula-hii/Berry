@@ -86,7 +86,7 @@ export async function getCurrentUser() {
 
       return {
         ...result,
-        avatar: userAvatar.toString(),
+        avatar: result.prefs?.avatar || userAvatar.toString(),
       };
     }
 

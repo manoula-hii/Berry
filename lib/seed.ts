@@ -139,7 +139,7 @@ async function seed() {
           ],
           description: `This is the description for ${name}.`,
           price: price,
-          rating: Math.floor(Math.random() * 5) + 1,
+          rating: parseFloat((Math.random() * 5).toFixed(1)), 
           image: image,
           painter: assignedPainter.$id,
         }

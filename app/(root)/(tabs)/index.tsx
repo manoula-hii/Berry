@@ -9,19 +9,22 @@ import { Card, FeaturedCard } from "@/components/Cards";
 import Filters from "@/components/Filters";
 import { useGlobalContext } from "@/lib/global-provider";
 import seed from "@/lib/seed";
-import { getLatestPaintings, getPaintings } from "@/lib/appwrite";
+import { getLatestPaintings, getPaintings, storage } from "@/lib/appwrite";
 import { useAppwrite } from "@/lib/useAppwrite";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NoResults from "@/components/NoResults";
+
+const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=660000&color=ffffff';
 
 export default function Index() {
   const { user } = useGlobalContext();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
   const { data: latestPaintings, loading: latestPaintingsloading } =
     useAppwrite({
       fn: getLatestPaintings,
     });
-
+    const bucketId = process.env.EXPO_PUBLIC_APPWRITE_BUCKET_ID;
     const {
       data: paintings,
       loading,
@@ -31,7 +34,7 @@ export default function Index() {
       params: {
         filter: params.filter!, // Pass the filter (type) from URL params
         query: params.query!,   // Pass the query (name) from URL params
-        limit: 20,
+        limit: 25,
       },
       skip: true,
     });
@@ -39,15 +42,39 @@ export default function Index() {
   const handleCardPress = (id: string) => router.push(`/propreties/${id}`);
 
   useEffect(() => {
+    const fetchAvatarUrl = async () => {
+        if (user?.avatar) {
+            try {
+                const fileUrl = user.avatar.includes('http')
+                    ? user.avatar
+                    : bucketId 
+                        ? storage.getFileView(bucketId, user.avatar)
+                        : '';
+                setAvatarUrl(fileUrl.toString());
+            } catch (error) {
+                console.error('Error getting avatar URL:', error);
+                setAvatarUrl(`${DEFAULT_AVATAR}&name=${encodeURIComponent(user?.name || 'User')}`);
+            }
+        } else {
+            setAvatarUrl(`${DEFAULT_AVATAR}&name=${encodeURIComponent(user?.name || 'User')}`);
+        }
+    };
+    
+
+    fetchAvatarUrl();
+}, [user?.avatar, user?.name]);
+
+  useEffect(() => {
     refetch({
       filter: params.filter!,
       query: params.query!,
-      limit: 20,
+      limit: 25,
     });
   }, [params.filter, params.query]);
 
   return (
     <SafeAreaView className="bg-white h-full">
+      <Button title="Seed" onPress={seed}/>
       <FlatList
         data={paintings}
         renderItem={({ item }) => (
@@ -70,7 +97,10 @@ export default function Index() {
             <View className="flex flex-row item-center justify-between mt-5 ml-4">
               <View className="flex flex-row items-center">
                 <Image
-                  source={{ uri: user?.avatar }}
+                                            source={{ 
+                                              uri: avatarUrl || DEFAULT_AVATAR,
+                                              cache: 'reload'
+                                          }}
                   className="size-12 rounded-full"
                 />
                 <View className="flex flex-col items-start ml-2 justify-center">
