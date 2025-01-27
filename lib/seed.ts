@@ -1,4 +1,4 @@
-import { ID } from "react-native-appwrite";
+import { ID, Models } from "react-native-appwrite";
 import { databases, config } from "./appwrite";
 import { paintersImages, paintingsImages } from "./data";
 import { Query } from "react-native-appwrite"; 
@@ -20,6 +20,60 @@ const paintingsTypes = [
   "Others",
 ];
 
+const paintingNames = [
+  "The Naturals",
+  "Moon Lake",
+  "Love",
+  "Memory",
+  "Happiness",
+  "The Kiss",
+  "Heartless",
+  "The Last Hug",
+  "Subbnautica",
+  "The Night Supper",
+  "WinterWood",
+  "The Garden of Candy",
+  "Hunt The Flamme",
+  "Festina",
+  "Wicked Deep",
+  "Night Circus",
+  "Powerless",
+  "Divine Rivals",
+  "Free The Stars",
+  "The Balade",
+  "Thinking",
+  "The Little Boy",
+  "The Painter",
+  "The Persistence of Happiness",
+  "Horizon",
+];
+
+const painterNames = [
+  "Lynn Garber",
+  "Kerry Barnes",
+  "Lily Roberts",
+  "Martin Black",
+  "Veronika Gounelle",
+  "Carol Brown",
+  "Kai Meyer",
+  "Laurent Ross",
+  "Ivan Doyle",
+  "Scott Eden",
+  "Amelie Nesbo",
+];
+
+function getRandomPainterName(): string {
+  return painterNames[Math.floor(Math.random() * painterNames.length)];
+}
+
+function getRandomPaintingName(): string {
+  return paintingNames[Math.floor(Math.random() * paintingNames.length)];
+}
+
+interface Props {
+  item: Models.Document & { painter: string }; // painter is the ID
+  onPress?: () => void;
+}
 
 function getRandomSubset<T>(
   array: T[],
@@ -35,14 +89,14 @@ function getRandomSubset<T>(
     );
   }
 
-  // Generate a random size for the subset within the range [minItems, maxItems]
+  
   const subsetSize =
     Math.floor(Math.random() * (maxItems - minItems + 1)) + minItems;
 
-  // Create a copy of the array to avoid modifying the original
+  
   const arrayCopy = [...array];
 
-  // Shuffle the array copy using Fisher-Yates algorithm
+  
   for (let i = arrayCopy.length - 1; i > 0; i--) {
     const randomIndex = Math.floor(Math.random() * (i + 1));
     [arrayCopy[i], arrayCopy[randomIndex]] = [
@@ -51,13 +105,13 @@ function getRandomSubset<T>(
     ];
   }
 
-  // Return the first `subsetSize` elements of the shuffled array
+  
   return arrayCopy.slice(0, subsetSize);
 }
 
 async function seed() {
   try {
-    // Clear existing data from all collections
+    // Clear existing data (unchanged)
     for (const key in COLLECTIONS) {
       const collectionId = COLLECTIONS[key as keyof typeof COLLECTIONS];
       const documents = await databases.listDocuments(
@@ -75,15 +129,28 @@ async function seed() {
 
     console.log("Cleared all existing data.");
 
+    // Track used painter names
+    const usedPainterNames = new Set<string>();
+
     // Seed Painters
     const painters = [];
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 11; i++) {
+      let name: string;
+
+      // Ensure the painter name is unique
+      do {
+        name = getRandomPainterName(); // Assign a random name
+      } while (usedPainterNames.has(name)); // Check if the name is already used
+
+      // Mark the name as used
+      usedPainterNames.add(name);
+
       const agent = await databases.createDocument(
         config.databaseId!,
         COLLECTIONS.PAINTER!,
         ID.unique(),
         {
-          name: `Painter ${i}`,
+          name: name, // Use the unique name
           email: `painter${i}@example.com`,
           avatar:
             paintersImages[Math.floor(Math.random() * paintersImages.length)],
@@ -93,13 +160,12 @@ async function seed() {
     }
     console.log(`Seeded ${painters.length} painters.`);
 
-    // Track used images, names, and prices to ensure uniqueness
+    // Rest of the code for seeding paintings (unchanged)
     const usedImages = new Set<string>();
     const usedNames = new Set<string>();
     const usedPrices = new Set<number>();
 
-    // Seed Paintings
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= 25; i++) {
       let image: string;
       let name: string;
       let price: number;
@@ -113,7 +179,7 @@ async function seed() {
       } while (usedImages.has(image));
 
       do {
-        name = `Painting ${i}`;
+        name = getRandomPaintingName(); // Use the random name generator
       } while (usedNames.has(name));
 
       do {
@@ -139,7 +205,7 @@ async function seed() {
           ],
           description: `This is the description for ${name}.`,
           price: price,
-          rating: parseFloat((Math.random() * 5).toFixed(1)), 
+          rating: parseFloat((Math.random() * 5).toFixed(1)),
           image: image,
           painter: assignedPainter.$id,
         }

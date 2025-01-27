@@ -54,4 +54,3 @@ export const Card = ({item: {image, rating, name, painter, price}, onPress}: Pro
     </TouchableOpacity>
     )
 }
-
