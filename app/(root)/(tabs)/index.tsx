@@ -32,8 +32,8 @@ export default function Index() {
     } = useAppwrite({
       fn: getPaintings,
       params: {
-        filter: params.filter!, // Pass the filter (type) from URL params
-        query: params.query!,   // Pass the query (name) from URL params
+        filter: params.filter!, 
+        query: params.query!,   
         limit: 25,
       },
       skip: true,

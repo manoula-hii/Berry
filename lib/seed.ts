@@ -71,7 +71,7 @@ function getRandomPaintingName(): string {
 }
 
 interface Props {
-  item: Models.Document & { painter: string }; // painter is the ID
+  item: Models.Document & { painter: string }; 
   onPress?: () => void;
 }
 
@@ -145,12 +145,14 @@ async function seed() {
       // Mark the name as used
       usedPainterNames.add(name);
 
+     
+
       const agent = await databases.createDocument(
         config.databaseId!,
         COLLECTIONS.PAINTER!,
         ID.unique(),
         {
-          name: name, // Use the unique name
+          name: name,
           email: `painter${i}@example.com`,
           avatar:
             paintersImages[Math.floor(Math.random() * paintersImages.length)],
@@ -169,6 +171,7 @@ async function seed() {
       let image: string;
       let name: string;
       let price: number;
+      let painter:string;
 
       // Generate unique image, name, and price
       do {
@@ -191,9 +194,15 @@ async function seed() {
       usedNames.add(name);
       usedPrices.add(price);
 
-      const assignedPainter =
-        painters[Math.floor(Math.random() * painters.length)];
+      const assignedPainter = painters.length
+  ? painters[Math.floor(Math.random() * painters.length)]
+  : null;
 
+  if (!assignedPainter || typeof assignedPainter.$id !== "string" || assignedPainter.$id.length > 36) {
+    console.error("Invalid painter ID:", assignedPainter);
+    continue; // Skip this iteration if invalid
+  }
+    
       const painting = await databases.createDocument(
         config.databaseId!,
         COLLECTIONS.PAINTING!,
